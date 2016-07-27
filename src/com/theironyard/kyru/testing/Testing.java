@@ -1,6 +1,8 @@
 package com.theironyard.kyru.testing;
 
+import java.io.*;
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 /**
  * Created by kdrudy on 7/25/16.
@@ -10,13 +12,13 @@ public class Testing {
     public static void main(String args[]) {
         System.out.println("Testing");
 
-//        for(int i = 2100000000;i<Integer.MAX_VALUE;i++) {
-//            if(isPrime(i)) {
-//                long time = System.currentTimeMillis();
-//                System.out.println(i + ":" + isPrime(i) + ":" + (System.currentTimeMillis()-time) + "ms");
-//            }
-//        }
+//        mersennePrime();
 
+        dissociatedPress(3, 2, 50, new File("./resources/big.txt"));
+
+    }
+
+    private static void mersennePrime() {
         //Mersenne Prime //Takes very long past 9th MPs
 //        2:3:1ms
 //        3:7:0ms
@@ -70,5 +72,86 @@ public class Testing {
             max = value.divide(bi);
         }
         return true;
+    }
+
+    public static void dissociatedPress(int pullWords, int match, int total, File textFile) {
+        try {
+
+            //Read in the file and split up the words
+            FileReader fr = new FileReader(textFile);
+
+            BufferedReader br = new BufferedReader(fr);
+
+            ArrayList<String> textWords = new ArrayList<>();
+
+            while(br.ready()) {
+                String line = br.readLine();
+                String[] words = line.split(" ");
+                for(String word : words) {
+                    if(!"".equals(word.trim())) {
+                        textWords.add(word);
+                    }
+                }
+            }
+
+            //Find a random starting point
+            int totalWords = textWords.size();
+            int startingPoint = (int)(Math.random()*(totalWords - pullWords));
+
+            //Pull in initial words and set up match words
+            String[] nextMatch = new String[match];
+            StringBuilder newText = new StringBuilder();
+            int wordCount = 0;
+
+            for(int i = 0;i<pullWords;i++) {
+                newText.append(textWords.get(startingPoint+i));
+                newText.append(" ");
+                wordCount++;
+                if(i - (pullWords - match) >= 0) {
+                    nextMatch[i - (pullWords - match)] = textWords.get(startingPoint+i);
+                }
+            }
+
+            //Continue matching until we get all the words we want
+            while(wordCount < total) {
+                ArrayList<Integer> possibleNewStart = new ArrayList<>();
+                //Find next match
+                for(int i = 0;i<totalWords;i++) {
+                    if (textWords.get(i).equals(nextMatch[0])) {
+                        boolean validMatch = true;
+                        for (int j = 0; j < match; j++) {
+                            if (!textWords.get(i + j).equals(nextMatch[j])) {
+                                validMatch = false;
+                            }
+                        }
+                        if (validMatch) {
+                            possibleNewStart.add(i);
+                        }
+                    }
+                }
+                int newStart = (int)(Math.random()*possibleNewStart.size());
+
+                for(int i = 0;i<pullWords;i++) {
+                    newText.append(textWords.get(possibleNewStart.get(newStart)+nextMatch.length+i));
+                    newText.append(" ");
+                    wordCount++;
+                    if(i - (pullWords - match) >= 0) {
+                        nextMatch[i - (pullWords - match)] = textWords.get(possibleNewStart.get(newStart)+nextMatch.length+i);
+                    }
+                }
+            }
+
+            //Print out line
+            System.out.println(newText.toString());
+
+
+        } catch (FileNotFoundException e) {
+            System.out.println("File Not Found: " + textFile.getAbsolutePath());
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 }
