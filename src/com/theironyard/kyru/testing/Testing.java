@@ -12,10 +12,12 @@ public class Testing {
     public static void main(String args[]) {
         System.out.println("Testing");
 
+
 //        mersennePrime();
 
-        dissociatedPress(3, 2, 50, new File("./resources/big.txt"));
-
+        for(int i = 0;i<10;i++) {
+            dissociatedPress(3, 1, 15, new File("./resources/timecube.txt"));
+        }
     }
 
     private static void mersennePrime() {
