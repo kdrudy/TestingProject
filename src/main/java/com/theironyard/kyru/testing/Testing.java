@@ -12,15 +12,16 @@ public class Testing {
     public static void main(String args[]) {
         System.out.println("Testing");
 
+        Testing t = new Testing();
 
-//        mersennePrime();
+        t.mersennePrime();
 
-        for(int i = 0;i<10;i++) {
-            dissociatedPress(3, 1, 15, new File("./resources/timecube.txt"));
-        }
+//        for(int i = 0;i<10;i++) {
+//            System.out.println(t.dissociatedPressFormatted(3, 1, 15, new File("./resources/timecube.txt")));
+//        }
     }
 
-    private static void mersennePrime() {
+    private void mersennePrime() {
         //Mersenne Prime //Takes very long past 9th MPs
 //        2:3:1ms
 //        3:7:0ms
@@ -44,10 +45,10 @@ public class Testing {
         }
     }
 
-    public static boolean isPrime(int value) {
+    public boolean isPrime(int value) {
         return isPrime(new Long(value));
     }
-    public static boolean isPrime(long value) {
+    public boolean isPrime(long value) {
         if(value == 0 || value == 1) { return false; }
         if(value == 2) { return true; }
         if(value%2 == 0) { return false; }
@@ -59,7 +60,7 @@ public class Testing {
         return true;
     }
 
-    public static boolean isPrime(BigInteger value) {
+    public boolean isPrime(BigInteger value) {
         BigInteger two = new BigInteger("2");
 
         if(value.equals(BigInteger.ZERO) || value.equals(BigInteger.ONE)) { return false; }
@@ -76,13 +77,34 @@ public class Testing {
         return true;
     }
 
-    public static void dissociatedPress(int pullWords, int match, int total, File textFile) {
+    public String dissociatedPressFormatted(int pullWords, int match, int total, String filename) {
+        String sentence = "";
+
+        do {
+            sentence = dissociatedPress(pullWords, match, total, filename);
+
+            //Fix formatting on text
+            sentence = sentence.substring(0, 1).toUpperCase() + sentence.substring(1);
+
+            if (sentence.indexOf(".") > 0) {
+                sentence = sentence.substring(0, sentence.indexOf(".") + 1);
+            } else {
+                sentence = sentence.trim() + ".";
+            }
+
+        } while(sentence.split(" ").length < 5); //Ensure we have some kind of sentence and not just a few words
+
+        return sentence;
+    }
+
+    public String dissociatedPress(int pullWords, int match, int total, String filename) {
         try {
 
             //Read in the file and split up the words
-            FileReader fr = new FileReader(textFile);
+            //FileReader fr = new FileReader(textFile);
 
-            BufferedReader br = new BufferedReader(fr);
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    this.getClass().getClassLoader().getResourceAsStream(filename)));
 
             ArrayList<String> textWords = new ArrayList<>();
 
@@ -144,16 +166,15 @@ public class Testing {
             }
 
             //Print out line
-            System.out.println(newText.toString());
-
+            return newText.toString();
 
         } catch (FileNotFoundException e) {
-            System.out.println("File Not Found: " + textFile.getAbsolutePath());
+            System.out.println("File Not Found: " + filename);
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
+        return new String();
     }
 }
