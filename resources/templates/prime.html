@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Is it Prime?</title>
+
+    <link rel="stylesheet" type="text/css" href="./dissociatedpress.css">
+</head>
+<body>
+{{#number}}
+<div><h2>{{number}}</h2></div>
+
+{{#isprime}}
+<div>Is Prime</div>
+{{/isprime}}
+{{^isprime}}
+<div>Is Not Prime</div>
+{{/isprime}}
+
+<br><br>
+{{/number}}
+
+<div>
+<form action="prime" method="post">
+    <input type="text" placeholder="Enter a number" name="number" required/>
+    <button type="submit">Is It Prime?</button>
+</form>
+</div>
+
+</body>
+</html>

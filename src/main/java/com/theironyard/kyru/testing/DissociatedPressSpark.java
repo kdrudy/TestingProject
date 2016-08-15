@@ -6,6 +6,7 @@ import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +27,6 @@ public class DissociatedPressSpark {
         Spark.get("/", ((req, res) ->
         {
             Testing t = new Testing();
-            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
             String newQuote = t.dissociatedPressFormatted(3, 1, 15, "timecube.txt");
             System.out.println(newQuote);
 
@@ -46,6 +46,31 @@ public class DissociatedPressSpark {
                 })
         );
 
+        Spark.get("/prime", ((req, res) ->
+        {
+
+            Map map = new HashMap();
+
+            return new ModelAndView(map, "prime.html");
+        }), new MustacheTemplateEngine());
+
+        Spark.post("/prime", ((request, response) -> {
+            Testing t = new Testing();
+
+            String numberString = request.queryParams("number");
+            Map map = new HashMap();
+            map.put("number", numberString);
+
+            if(t.isInteger(numberString)) {
+                boolean isPrime = t.isPrime(new BigInteger(numberString));
+
+                map.put("isprime", isPrime);
+            } else {
+                //If it's not an integer, just return that it is not prime
+                map.put("isprime", false);
+            }
+            return new ModelAndView(map, "prime.html");
+        }), new MustacheTemplateEngine());
     }
 
     static int getHerokuAssignedPort() {
@@ -55,4 +80,5 @@ public class DissociatedPressSpark {
         }
         return 4567; //return default port if heroku-port isn't set (i.e. on localhost)
     }
+
 }
