@@ -16,13 +16,13 @@ import java.util.regex.Pattern;
  */
 public class Testing {
 
-    public static void main(String args[]) throws TwitterException {
+    public static void main(String args[]) throws Exception {
         System.out.println("Testing");
 
         Testing t = new Testing();
 
 //        t.mersennePrime();
-
+//
         Twitter twitter = TwitterFactory.getSingleton();
         System.out.println(twitter.getRateLimitStatus().get("/statuses/user_timeline"));
         Paging p = new Paging();
@@ -30,7 +30,7 @@ public class Testing {
         StringBuilder sb = new StringBuilder();
         for (int i = 1; i < 10; i++) {
             p.setPage(i);
-            List<Status> statuses = twitter.getHomeTimeline(p);
+            List<Status> statuses = twitter.getUserTimeline(p);
 
             for (Status s : statuses) {
                 if (!s.getText().startsWith("RT")) {
@@ -41,8 +41,19 @@ public class Testing {
         }
 
 
-        //String dp = t.dissociatedPress(3, 1, 100, "./resources/timecube.txt");
-        String dp = t.dissociatedPress(3, 1, 100, sb);
+//        String dp = t.dissociatedPress(10, 1, 2, 100, "./resources/timecube.txt");
+        String dp = t.dissociatedPress(5, 1, 2, 100, sb);
+
+//        Scanner scanner = new Scanner(new File("./resources/timecube.txt"));
+//        StringBuilder sb = new StringBuilder();
+//        while(scanner.hasNext()) {
+//            sb.append(scanner.nextLine());
+//            sb.append(" ");
+//        }
+//
+//        MarkovChain mc = new MarkovChain();
+//        mc.buildFrequencyTable(sb);
+//        String dp = mc.getMarkovChain(500);
 
         System.out.println(dp);
 
@@ -54,6 +65,8 @@ public class Testing {
         }
 
     }
+
+
 
     private ArrayList<String> extractSentences(String dp) {
         ArrayList<String> sentences = new ArrayList<>();
@@ -145,7 +158,10 @@ public class Testing {
         return true;
     }
 
-    public String dissociatedPressFormatted(int pullWords, int match, int total, String filename) {
+    public String dissociatedPressFormatted(int pullWords, int match, int total, String filename) throws Exception {
+        return dissociatedPressFormatted(pullWords, pullWords, match, total, filename);
+    }
+    public String dissociatedPressFormatted(int initializePullWOrds, int pullWords, int match, int total, String filename) throws Exception {
         String sentence = "";
 
         do {
@@ -165,17 +181,22 @@ public class Testing {
         return sentence;
     }
 
-
-    public String dissociatedPress(int pullWords, int match, int total, StringBuilder sb) {
+    public String dissociatedPress(int pullWords, int match, int total, StringBuilder sb) throws Exception {
+        return dissociatedPress(pullWords, pullWords, match, total, sb);
+    }
+    public String dissociatedPress(int initialPullWords, int pullWords, int match, int total, StringBuilder sb) throws Exception {
         Scanner scanner = new Scanner(sb.toString());
-        return dissociatedPress(pullWords, match, total, scanner);
+        return dissociatedPress(initialPullWords, pullWords, match, total, scanner);
     }
 
-    public String dissociatedPress(int pullWords, int match, int total, String filename) {
+    public String dissociatedPress(int pullWords, int match, int total, String filename) throws Exception {
+        return dissociatedPress(pullWords, pullWords, match, total, filename);
+    }
+    public String dissociatedPress(int initialPullWords, int pullWords, int match, int total, String filename) throws Exception {
         try {
             Scanner scanner = new Scanner(new File(filename));
 
-            return dissociatedPress(pullWords, match, total, scanner);
+            return dissociatedPress(initialPullWords, pullWords, match, total, scanner);
         } catch (FileNotFoundException e) {
             System.out.println("File Not Found: " + filename);
             e.printStackTrace();
@@ -183,7 +204,15 @@ public class Testing {
         return null;
     }
 
-    public String dissociatedPress(int pullWords, int match, int total, Scanner scanner) {
+    public String dissociatedPress(int pullWords, int match, int total, Scanner scanner) throws Exception {
+        return dissociatedPress(pullWords, pullWords, match, total, scanner);
+    }
+
+    public String dissociatedPress(int initialPullWords, int pullWords, int match, int total, Scanner scanner) throws Exception {
+
+        if(initialPullWords < match) {
+            throw new Exception("Initial pull words can't be less then match words");
+        }
 
         //Read in the file and split up the words
         //FileReader fr = new FileReader(textFile);
@@ -205,16 +234,16 @@ public class Testing {
         int startingPoint = (int) (Math.random() * (totalWords - pullWords));
 
         //Pull in initial words and set up match words
-        String[] nextMatch = new String[match];
+        ArrayList<String> nextMatch = new ArrayList<>();
         StringBuilder newText = new StringBuilder();
         int wordCount = 0;
 
-        for (int i = 0; i < pullWords; i++) {
+        for (int i = 0; i < initialPullWords; i++) {
             newText.append(textWords.get(startingPoint + i));
             newText.append(" ");
             wordCount++;
-            if (i - (pullWords - match) >= 0) {
-                nextMatch[i - (pullWords - match)] = textWords.get(startingPoint + i);
+            if (i - (initialPullWords - match) >= 0) {
+                nextMatch.add(textWords.get(startingPoint + i));
             }
         }
 
@@ -223,10 +252,10 @@ public class Testing {
             ArrayList<Integer> possibleNewStart = new ArrayList<>();
             //Find next match
             for (int i = 0; i < totalWords; i++) {
-                if (textWords.get(i).equals(nextMatch[0])) {
+                if (textWords.get(i).equals(nextMatch.get(0))) {
                     boolean validMatch = true;
                     for (int j = 0; j < match; j++) {
-                        if (!textWords.get(i + j).equals(nextMatch[j])) {
+                        if (i+j >= totalWords || !textWords.get(i + j).equals(nextMatch.get(j))) {
                             validMatch = false;
                         }
                     }
@@ -235,16 +264,16 @@ public class Testing {
                     }
                 }
             }
+
             int newStart = (int) (Math.random() * possibleNewStart.size());
 
             for (int i = 0; i < pullWords; i++) {
-                newText.append(textWords.get(possibleNewStart.get(newStart) + nextMatch.length + i));
+                String newWord = textWords.get(possibleNewStart.get(newStart) + match + i);
+                newText.append(newWord);
                 newText.append(" ");
                 wordCount++;
-                if (i - (pullWords - match) >= 0) {
-                    nextMatch[i - (pullWords - match)] = textWords.get(possibleNewStart.get(newStart) + nextMatch.length + i);
-                }
-            }
+                nextMatch.remove(0);
+                nextMatch.add(newWord);}
         }
 
         //Print out line
