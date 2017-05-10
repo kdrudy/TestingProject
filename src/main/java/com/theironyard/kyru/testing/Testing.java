@@ -23,26 +23,26 @@ public class Testing {
 
 //        t.mersennePrime();
 //
-        Twitter twitter = TwitterFactory.getSingleton();
-        System.out.println(twitter.getRateLimitStatus().get("/statuses/user_timeline"));
-        Paging p = new Paging();
-        p.setCount(200);
-        StringBuilder sb = new StringBuilder();
-        for (int i = 1; i < 10; i++) {
-            p.setPage(i);
-            List<Status> statuses = twitter.getUserTimeline(p);
+//        Twitter twitter = TwitterFactory.getSingleton();
+//        System.out.println(twitter.getRateLimitStatus().get("/statuses/user_timeline"));
+//        Paging p = new Paging();
+//        p.setCount(200);
+//        StringBuilder sb = new StringBuilder();
+//        for (int i = 1; i < 10; i++) {
+//            p.setPage(i);
+//            List<Status> statuses = twitter.getUserTimeline(p);
+//
+//            for (Status s : statuses) {
+//                if (!s.getText().startsWith("RT")) {
+//                    sb.append(". " + s.getText());
+//                }
+//
+//            }
+//        }
 
-            for (Status s : statuses) {
-                if (!s.getText().startsWith("RT")) {
-                    sb.append(". " + s.getText());
-                }
 
-            }
-        }
-
-
-//        String dp = t.dissociatedPress(10, 1, 2, 100, "./resources/timecube.txt");
-        String dp = t.dissociatedPress(5, 1, 2, 100, sb);
+        String dp = t.dissociatedPress(5, 1, 2, 100, "./resources/big.txt");
+//        String dp = t.dissociatedPress(5, 1, 2, 100, sb);
 
 //        Scanner scanner = new Scanner(new File("./resources/timecube.txt"));
 //        StringBuilder sb = new StringBuilder();
