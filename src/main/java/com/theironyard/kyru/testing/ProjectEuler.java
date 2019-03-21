@@ -1,9 +1,12 @@
 package com.theironyard.kyru.testing;
 
-import java.awt.*;
+//import java.awt.*;
 import java.io.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * Created by kdrudy on 7/28/16.
@@ -12,7 +15,7 @@ public class ProjectEuler {
 
     static int counter = 0;
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws FileNotFoundException {
 
         ProjectEuler pe = new ProjectEuler();
 
@@ -36,7 +39,39 @@ public class ProjectEuler {
 
         //137846528820
         //pe.latticePathsPE15();
+        
+        pe.namesScoresPE22();
     }
+    
+    public void namesScoresPE22() throws FileNotFoundException {
+        File namesFile = new File("./resources/p022_names.txt");
+        Scanner sc = new Scanner(namesFile);
+        sc.useDelimiter(",");
+        List<String> nameList = new ArrayList<>();
+        while(sc.hasNext()) {
+            nameList.add(sc.next().replaceAll("\"", ""));
+        }
+        
+        nameList = nameList.stream().sorted().collect(Collectors.toList());
+        
+        long sum = 0;
+        
+        for(int i = 0;i<nameList.size();i++) {
+            int nameWorth = 0;
+            String name = nameList.get(i);
+            for(char c : name.toCharArray()) {
+                nameWorth += letterWorthPE22(c);
+            }
+            sum = sum + (nameWorth * (i+1));
+        }
+        System.out.println(sum);
+        
+    }
+    
+    private int letterWorthPE22(char a) {
+        return Character.getNumericValue(a) - 9;
+    }
+   
 
     public void amicableNumbersPE21() {
 

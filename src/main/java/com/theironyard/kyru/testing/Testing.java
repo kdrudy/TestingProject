@@ -1,15 +1,16 @@
 package com.theironyard.kyru.testing;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import twitter4j.*;
 
 import java.io.*;
 import java.lang.reflect.Array;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by kdrudy on 7/25/16.
@@ -18,52 +19,122 @@ public class Testing {
 
     public static void main(String args[]) throws Exception {
         System.out.println("Testing");
+        
+        System.out.println(Character.getNumericValue('A'));
+        System.out.println(Character.getNumericValue('a'));
+        System.out.println(Character.getNumericValue('B'));
+        System.out.println(Character.getNumericValue('b'));
 
         Testing t = new Testing();
+        System.out.print("\033[H\033[2J");
 
 //        t.mersennePrime();
 //
 //        Twitter twitter = TwitterFactory.getSingleton();
 //        System.out.println(twitter.getRateLimitStatus().get("/statuses/user_timeline"));
+//
 //        Paging p = new Paging();
 //        p.setCount(200);
 //        StringBuilder sb = new StringBuilder();
 //        for (int i = 1; i < 10; i++) {
 //            p.setPage(i);
-//            List<Status> statuses = twitter.getUserTimeline(p);
+//            List<Status> statuses = twitter.getUserTimeline("davemeltzerWON", p);
 //
 //            for (Status s : statuses) {
 //                if (!s.getText().startsWith("RT")) {
-//                    sb.append(". " + s.getText());
+//                    sb.append("^" + s.getText() + "`");
 //                }
 //
 //            }
 //        }
 
 
-        String dp = t.dissociatedPress(5, 1, 2, 100, "./resources/big.txt");
-//        String dp = t.dissociatedPress(5, 1, 2, 100, sb);
+//        String dp = t.dissociatedPress(5, 1, 2, 100, "./resources/big.txt");
+//        String dp = t.dissociatedPress(5, 1, 2, 500, sb);
 
 //        Scanner scanner = new Scanner(new File("./resources/timecube.txt"));
+//        List<Tweet> tweets = t.loadTweetsFile();
+//        tweets.stream()
+//                .collect(Collectors.groupingBy((tw) -> tw.getUserKey()))
+//                .entrySet()
+//                .stream()
+//                .sorted(Comparator.comparingInt((Map.Entry<String, List<Tweet>> e) -> e.getValue().size()).reversed())
+//                .forEach((e) -> {
+//                    User user;
+//                    try {
+//                        user = twitter.showUser(e.getKey());
+//                    } catch (TwitterException e1) {
+//                        user = null;
+//                    }
+//                    System.out.println(e.getKey() + " count: " + e.getValue().size() + " exists: " + ((user == null) ? "no" : "yes"));
+//                });
+
+
+
+//        tweets.stream()
+//                .filter((tw) -> tw.getUserKey().equals("ameliebaldwin"))
+//                .forEach((tw) -> System.out.println(tw.getText()));
 //        StringBuilder sb = new StringBuilder();
+//        for(Tweet tweet : tweets) {
+//            sb.append(tweet.getText());
+//        }
 //        while(scanner.hasNext()) {
 //            sb.append(scanner.nextLine());
 //            sb.append(" ");
 //        }
-//
+
 //        MarkovChain mc = new MarkovChain();
 //        mc.buildFrequencyTable(sb);
 //        String dp = mc.getMarkovChain(500);
 
-        System.out.println(dp);
+//        System.out.println(dp);
 
-        ArrayList<String> sentences = t.extractSentences(dp);
+//        String[] tweets = dp.split("`\\^");
 
-        for(String s : sentences) {
-            System.out.println();
-            System.out.println(s);
+//        for(String s : tweets) {
+//            System.out.println();
+//            System.out.println(s);
+//        }
+//
+//        ArrayList<String> sentences = t.extractSentences(dp);
+//
+//        for(String s : sentences) {
+//            System.out.println();
+//            System.out.println(s);
+//        }
+        
+        //System.out.println("1113213211: " + t.isPrime(1113213211));
+
+    }
+
+    private List<Tweet> loadTweetsFile() throws IOException {
+        //Scanner scanner = new Scanner(new File("./resources/tweets.csv"));
+        Reader in = new FileReader("./resources/tweets.csv");
+        Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(in);
+        List<Tweet> tweets = new ArrayList<>();
+        for(CSVRecord record : records) {
+            Tweet tweet = new Tweet();
+            tweet.setUserId(record.get(0));
+            tweet.setUserKey(record.get(1));
+            tweet.setCreatedAt(record.get(2));
+            tweet.setCreatedStr(record.get(3));
+            tweet.setRetweetCount(record.get(4));
+            tweet.setRetweeted(record.get(5));
+            tweet.setFavoriteCount(record.get(6));
+            tweet.setText(record.get(7));
+            tweet.setTweetId(record.get(8));
+            tweet.setSource(record.get(9));
+            tweet.setHashtags(record.get(10));
+            tweet.setExpandedUrls(record.get(11));
+            tweet.setPosted(record.get(12));
+            tweet.setMentions(record.get(13));
+            tweet.setRetweetedStatusId(record.get(14));
+            tweet.setInReplyToStatusId(record.get(15));
+
+            tweets.add(tweet);
         }
 
+        return tweets;
     }
 
 
